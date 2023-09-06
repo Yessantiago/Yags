@@ -87,16 +87,16 @@ Bicoloration:=function(g)
    while Level1 <> [] do 
       color := 3 -color;
       Level2:= Difference(Union(Adjacencies(g){Level1}),Level0);
-      Print(Level0,"\n");
-      Print(Level1,"\n");
-      Print(Level2,"\n");
-      #Interseccion de Level0 y Adj para validar 
+      # Print(Level0,"\n");
+      # Print(Level1,"\n");
+      # Print(Level2,"\n");
+      # #Interseccion de Level0 y Adj para validar 
       if (Intersection(Level1,Level2)<>[]) then 
          return fail; 
       fi; 
       #Coloreando adyacentes actuales
       coloring{Level1} := List(Level1, z->color);
-      Print(coloring,"***\n");
+      #Print(coloring,"***\n");
       #Actualizar variables
       Level0:=Level1; 
       Level1:= Level2; 
@@ -107,11 +107,26 @@ end;
 
 #Bicoloration(g);
 
-
 Bipartition := function(g)
-    local colo;
-    colo:=Bicoloration(g);
-    return [Positions(colo,1),Positions(colo,2)];
+   local colo;
+   colo:=Bicoloration(g);
+
+   if colo <> fail then 
+      return [Positions(colo,1),Positions(colo,2)];
+   else 
+      return fail;
+   fi; 
 end;
 
+
+IsBipartite:= function(g)
+   local answer;
+   answer:=Bicoloration(g);
+
+   if answer <> fail then 
+      return true;
+   else 
+      return false;
+   fi; 
+end;
 
