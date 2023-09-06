@@ -1,2 +1,2 @@
 # yags-terminal_project
-Code for the version's YAGS 0.0.7.
+Code for YAGS version 0.0.7.
