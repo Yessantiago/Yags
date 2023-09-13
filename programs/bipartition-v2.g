@@ -3,8 +3,7 @@ L:=[[1,6],[6,7],[7,8],[8,5],[5,6],[5,2],[1,2],[2,3],[3,4],[4,5],
 g:=GraphByEdges(L); 
 
 Bicoloration:= function(g)
-    local coloration, colored,color,x,y,tiempo_inicio, tiempo_fin, tiempo_total; 
-    tiempo_inicio := Runtime();
+    local coloration, colored,color,x,y; 
     coloration:=[];
     colored:=[]; 
     color := 1;
@@ -25,10 +24,6 @@ Bicoloration:= function(g)
             fi; 
         od; 
     od;
-
-    tiempo_fin := Runtime();
-    tiempo_total := tiempo_fin - tiempo_inicio;
-    Print("Tiempo transcurrido en segundos: ", tiempo_total, "\n");
 
     return coloration; 
 end; 
