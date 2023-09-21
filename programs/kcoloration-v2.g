@@ -6,41 +6,50 @@ lista := [[1,2],[2,3], [3,4], [4,9], [9,5],
 g:=GraphByEdges(lista);
 
 #g:=PathGraph(5);
-#L:= Lista de colores, dada por el usuario
 
+#Devuelve el vertice con mayores adyacentes
+MaxAdj := function(ady)
+    local x, mayor,v;
+    mayor:=0;  
 
-# Da como resultado el adyacente con mayores vertices 
-MaxAdj := function(g)
-    local x,v,max;
-    v := Vertices(g);
-
-    max:= v[1]; #Al comienzo el primer vertice es el maximo con adyacentes
-    for x in v do 
-        #compara el max con los adyacentes del siguiente
-        if (x+1 <= Length(v)) then
-            if (Length(Adjacency(g,max)) < Length(Adjacency(g,x+1))) then
-                max:= v[x+1];
+    for x in [1..Length(ady)] do           
+        if (IsBound(ady[x]))then 
+            if (Length(ady[x]) > mayor)then 
+                mayor:= Length(ady[x]);
+                v:= Position(ady,ady[x]);
             fi;
         fi; 
     od; 
-    return max; 
-end;
+    return v;
+end; 
 
+#Devuelve una lista ordenada de los vertices 
+# con mayores adyacentes a menores
+ListMaxAdj := function(g) #Regresa 
+    local LAdy,mayor, ListaOrd; 
+   
+    LAdy:= Adjacencies(g);
+    ListaOrd:=[];
+    
+    while (LAdy <> []) do
+        mayor:= MaxAdj(LAdy); 
+        Add(ListaOrd, mayor);
+        Unbind(LAdy[mayor]); 
+    od; 
+
+    return ListaOrd;
+
+end; 
+
+ 
 
 Kcoloration:=function(g,k)
-    local colors,v,a; 
+    local colors,v,a,x; 
     colors:=[1..k]; 
     v := Vertices(g);
     a:=[];
 
-    # Lista iterativa de los que tienen mayor a menor adyacente L:=[13,] luego sacar adyacentes de 13, 
-    # y así hasta tener la lista 
-
-    for x in v do 
-        Add(a,MaxAdj(g)); 
-        Print(a,"\n");
-
-    od; 
+    Print(ListMaxAdj(g)); 
 
 
 end;
