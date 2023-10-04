@@ -9,38 +9,40 @@ lista:= [[1,2], [2,3],[3,6], [6,8],[8,7], [7,9],[7,5],[7,4],[4,1],[5,10],[5,2],[
 g:=GraphByEdges(lista);
 
 #Devuelve el elemento de mayor grado de una lista de una grafica 
-VertexMaxDegree := function(g,v) #Cambiar de darle una función g a una lista 
-    local ListaOrd, ListMaj; 
+VertexMaxDegree := function(g,V) #Cambiar de darle una función g a una lista 
+    local ListMaj; 
 
-    ListMaj := List(v, x -> VertexDegree(g,x));
-    SortParallel(ListMaj,v); 
-    ListaOrd:= Reversed(v);
+    ListMaj := List(V, x -> VertexDegree(g,x));
+    SortParallel(ListMaj,V); 
 
-   return ListaOrd[1];
-
+    return Last(V);
 end; 
 
 
 FirstOrder:= function(g)
-    local v, L, CurrentV;
-    v:= Vertices(g); 
+    local V, L, CurrentV, sigMayorG;
+    V:= Vertices(g); 
     L:=[];
     
-    Add(L,VertexMaxDegree(g, v)); #Agrega el de mayor grado a la lista L 
-    Remove(v, Position(v,Last(L))); #Quita el elemento de v que se agrego a L 
+    Add(L,VertexMaxDegree(g, V)); #Agrega el de mayor grado a la lista L 
+    Remove(V, Position(V,Last(L))); #Quita el elemento de V que se agrego a L 
     
-    while v <> [] do
-        CurrentV:= Adjacency(g,Last(L)); #Adyacentes del vertice actual 
+    while V <> [] do
+        CurrentV:= Adjacency(g,Last(L)); #Adyacentes del Vertice actual 
         CurrentV:= Difference(CurrentV, L); #Quita la diferencia
-
-        if CurrentV = [] then
-            Add(L,Last(v));
-            Remove(v, Position(v,Last(L))); #Quita el elemento de v que se agrego a L 
-        else 
-            Add(L,VertexMaxDegree(g, v)); #Agrega el de mayor grado a la lista L
-            Remove(v, Position(v,Last(L))); #Quita el vertice que se acaba de agregar a L 
+        
+        #Si los adyacentes del ultimo elemento en L ya están en L 
+        #entonces se toma el último vertice con mayor grado, i.e. 
+        #ultimo elemento en V
+        if CurrentV = [] then 
+            sigMayorG := Last(V);
+        else  #Sino, se obtiene el vertice de mayor grado de los
+              # adyacentes del último agregado a L 
+            sigMayorG := VertexMaxDegree(g, CurrentV);
         fi;         
-
+        
+        Add(L,sigMayorG); #Agrega el de mayor grado a la lista L
+        Remove(V, Position(V,Last(L))); #Quita el vertice que se acaba de agregar a L 
     od; 
 
     return L; 
@@ -54,6 +56,8 @@ Kcoloration:=function(g,k)
     local colors,v, L, Extra; 
     colors:=[1..k]; 
 
+    L:=FirstOrder(g);
+    Print(L,"\n");
     Extra:=[g,FirstOrder(g), colors];
     Backtrack(L,Opts,Chk,Order(g),Extra);
     
