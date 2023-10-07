@@ -15,44 +15,42 @@ end;
 
 
 FirstOrder:= function(g)
-    local L, Adj, ListMaxDegree, I,x, y, mayor,C,B;
-    C:=[]; 
-    B:=[];
-    L:=[];
+    local L, Adj, ListMaxDegree, I,x, y, mayor,C,tamIn;
     ListMaxDegree:=[]; 
+    L:=[];
     I:= []; 
-    #Lista de adyecentes de la grafica
+    C:=[]; 
+    
     Adj:= Adjacencies(g);
 
-    ListMaxDegree:= VertexMaxDegree(g); #Se ordena una sola vez
+    ListMaxDegree:= VertexMaxDegree(g); #Se ordena los vertices por grados
     Add(L,ListMaxDegree[1]); #Agrega el de mayor grado a la lista L 
-    Adj[Last(L)] := [];
+    Adj[Last(L)] := []; #Se remueve los adyacentes del vertice que se agrega a L
     
     while Length(L) <> Length(Vertices(g)) do
-        for x in Adj do #x es la sublista de los adyacentes
-            Add(I, Length(Intersection(L,x)));
+        
+        mayor:= 0; #variable para definir que vertice o vertices tienen el mayor grado  
+        for x in Adj do 
+            tamIn:= Length(Intersection(L,x)); #Revisa la cantidad de vecinos que hay L           
+            if tamIn >= mayor then #Valida si el numero de vecinos es mayor o igual respecto al actual 
+                if (tamIn > mayor)then #Si es mayor, se reinician las listas y el mayor es el tam. de la interseccion encontrada
+                    I:=[];
+                    C:=[];
+                    mayor:=tamIn;
+                fi;
+                Add(I,Position(Adj,x)); #Agrega a I la posicion del vertice con mayores vecinos
+            fi;
         od;
-
-        mayor:= 0;  
-        for y in I do 
-            if mayor < y then 
-                mayor:= y; 
-            fi; 
-        od;
-    
-        #Si mayor <> 0 entonces encontrar sus posiciones en L 
-        B:= Positions(I, mayor);        
-        if mayor <> 0 and Length(B)>0 then 
-            if Length(B)>1 then
-                for x in B do
-                    Add(C, Position(ListMaxDegree,x));
-                od;
-                SortParallel(C,B);
-            fi; 
-
-            Add(L, B[1]);
+        Print("I:: ",I,"\n");
+        if Length(I)>0 then #Valida si hay elementos en I
+            if Length(I)>1 then #Si hay mas de un elemento, se ordenan
+                C:= List(I, x -> Position(ListMaxDegree,x)); #Se toman las posiciones de los elementos de I dada por sus grados 
+                SortParallel(C,I); #Ordena I respecto a C
+            fi;
+            Add(L, I[1]); #Agrega el mayor a L
         fi;
-        Adj[Last(L)] := [];
+
+        Adj[Last(L)] := []; #Se limpian las listas
         C:=[];
         I:=[];
     od;
