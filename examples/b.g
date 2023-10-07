@@ -7,9 +7,11 @@ orden:= function()
     B:=[2,4,6,7,10];
     #¿como encuentro las posiciones?
 
-    for x in B do
-        Add(C, Position(A,x));
-    od;
+    # for x in B do
+    #     Add(C, Position(A,x));
+    # od;
+    C:= List(B, x -> Position(A,x));
+
 
     Print("Posiciones de elemento de B en A:: ",C,"\n");
     SortParallel(C,B);
