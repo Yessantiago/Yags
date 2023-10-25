@@ -7,7 +7,7 @@ chk:=function(L,g)
     #Print("L::",L,"\n");
     if L=[] then return true; fi;
         x:=Length(L);
-        Print("L::",L,"  X:: ",x,"\n");
+        #Print("L::",L,"  X:: ",x,"\n");
     for y in [1..x-1] do
         #Print("L en for::",L,"\n");
         if IsEdge(g,[x,y]) and L[x]=L[y] then
@@ -24,11 +24,7 @@ Kcoloration:=function(g,k)
     colors:=[1..k]; 
     L:=[];
 
-    if Backtrack(L,colors,chk, Order(g), g) <> fail then 
-        Print("L::",L,"\n");
-        return true;
-    else 
-        return false; 
-    fi; 
-
+    return Backtrack(L,colors,chk, Order(g), g); 
+    if L=[fail] then return fail; fi;
+    
 end;
