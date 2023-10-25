@@ -41,19 +41,25 @@ chk := function(L, Extra)
 end;
 
 Kcoloration:=function(g,k)
-  local colors, L, Extra; 
+  local i,colors, L, PO,R,Extra; 
   colors:=[1..k]; 
   L:=[];
-
-  #Print("O::",PreOrdena(g),"\n");
-  Extra:=[g,PreOrdena(g)];
+  PO:=PreOrdena(g);
+  Extra:=[g,PO];
     
-  if Backtrack(L,colors,chk, Order(g), Extra) <> fail then 
-    #Print("L::",L,"\n");
-    return true;
-  else 
-    return false; 
-  fi; 
+  Backtrack(L,colors,chk, Order(g), Extra); 
+  #L{PO}:=L;
+  if L=[fail] then return fail; fi;
+  R:=[];
+  for i in [1..Length(L)] do
+     R[PO[i]]:=L[i];
+  od;
+  return R;
+end;
 
-  Print("L:: ",L);
+GG:=function(n,k) 
+   local edgs;
+   edgs:=Cartesian([n],[2..n-2]);
+   edgs:=Union(edgs,[[1,n-1],[n-1,n]]);
+   return GraphByEdges(edgs);
 end;
