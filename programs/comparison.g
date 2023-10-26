@@ -37,7 +37,8 @@ chk := function(L, Extra)
     return true;
 end;
 
-Kcoloration:=function(g,k)
+#Static ordering.
+Kcoloration2:=function(g,k)
   local i,colors, L, PO,R,Extra; 
   colors:=[1..k]; 
   L:=[];
@@ -69,7 +70,8 @@ chk1:=function(L,g)
     return true;
 end;
 
-Kcoloration2:=function(g,k)
+#Plain backtrack.
+Kcoloration1:=function(g,k)
     local colors,L; 
     colors:=[1..k]; 
     L:=[];
@@ -82,36 +84,6 @@ end;
 
 
 #############################
-
-
-Comparison:= function(g,k)
-    local ini, fin, t1,t2; 
-
-    ini:= NanosecondsSinceEpoch();
-    Print("Kcoloration:: ",Kcoloration(g,k),"\n");
-    fin:=NanosecondsSinceEpoch(); 
-
-    t1 := fin-ini; 
-
-    Print("  Kcoloration: ",t1," ns\n");
-
-    ini:= NanosecondsSinceEpoch();
-    Print("Kcoloration2:: ",Kcoloration2(g,k),"\n");
-    fin:=NanosecondsSinceEpoch(); 
-
-    t2 := fin-ini;  
-    Print("  Kcoloration2: ",t2," ns\n\n");
-
-    if t1 < t2 then
-        Print(" Kcoloration(t) < Kcoloration2(t) \n");
-    elif t1 > t2 then
-        Print("  Kcoloration(t) > Kcoloration2(t) \n");
-
-    else
-        Print("  Kcoloration(t) = Kcoloration2(t) \n");
-    fi;
-
-end; 
 
 ####Graficas
 GG:=function(n,k) 
@@ -130,10 +102,11 @@ end;
 
 
 GG2:=function(n,k) 
-    local edgs,rest;
+    local edgs,rest,bola;
     edgs:=Cartesian([1,n],[n-k+1..n-1]);
-    rest:=Cartesian([2..n-k],[n-k+1..n-1]);
-    edgs:=Union(edgs,rest);
+    rest:=Cartesian([2..n-k],Union([n-k+1..n-2],[n]));
+    bola:=Cartesian([n-k+1..n-1],[n-k+1..n-1]);
+    edgs:=Union(edgs,rest,bola);
     return GraphByEdges(edgs);
 end;
 
@@ -146,4 +119,84 @@ GGG:= function(k)
     edgs1:= Union(Edges(b), edgs1,edgs2);
    return GraphByEdges(edgs1);
 
+end; 
+
+#############################
+##############################################
+#Truncate to tree significan digits.
+#String may contain units like " ms", " years".
+#The space before the unis is required.
+TruncateFloat:=function(str)
+  local len,posexp,pospoint,posspace,str1,str2,str3,count,i;
+  if IsRat(str) then str:=Float(str); fi;
+  if IsFloat(str) then str:=String(str); fi;
+  if str="--" then return str; fi;
+  len:=Length(str);
+  pospoint:=Position(str,'.');
+  posexp:=Position(str,'e');
+  if posexp=fail then posexp:=len+1; fi;
+  posspace:=Position(str,' ');
+  if posspace=fail then posspace:=len+1; fi;
+  posexp:=Minimum(posexp,posspace);
+  str1:=str{[1..pospoint]};
+  str2:=str{[pospoint+1..posexp-1]};
+  str3:=str{[posexp..len]};
+  if str1="0." then
+    count:=0;
+    for i in [1..Length(str2)] do 
+      if str2[i] in "123456789" then count:=count+1; fi;
+      if count>=3 then break; fi;
+    od;
+    if count>=3 then 
+      str2:=str2{[1..i]};
+    fi;
+    return Concatenation(str1,str2,str3);
+  else
+    count:=Length(str1)-1;
+    return Concatenation(str1,str2{[1..Minimum(3-count,Length(str2))]},str3);    
+  fi;
+end;
+
+HumanTime:=function(time) #time in nanoseconds 
+  local scales, units, n, i;
+  if IsString(time) then return time; fi;
+  if IsInt(time) then time:=Float(time); fi;
+  scales:=[10.^3,10.^3,10.^3,60.,60.,24.,30.,365./30.];
+  units:=["ns","µs","ms","s","min","h","days","months","years"];
+  n:=Length(scales);
+  for i in [1..n] do 
+    if time<scales[i] then
+      return Concatenation(String(time)," ",units[i]);
+    else
+      time:=time/scales[i];
+    fi;
+  od;
+  return Concatenation(String(time)," ",units[n+1]);    
+end;
+
+THumanTime:=function(time) #time in nanoseconds 
+  return TruncateFloat(HumanTime(time));  
+end;
+
+#########################################
+Comparison:= function(g,k)
+    local ini, fin, col1,col2,t1,t2; 
+
+    ini:= NanosecondsSinceEpoch();
+      col2:=Kcoloration2(g,k); #fast
+    fin:=NanosecondsSinceEpoch(); 
+    t2 := fin-ini; 
+    Print("Kcoloration2 time: ",THumanTime(t2),"\n");
+
+    ini:= NanosecondsSinceEpoch();
+      col1:=Kcoloration1(g,k); #slow
+    fin:=NanosecondsSinceEpoch(); 
+    t1 := fin-ini;  
+    Print("Kcoloration1 time: ",THumanTime(t1),"\n");
+    
+    if col1=fail and col2<>fail or col1<>fail and col2 = fail then 
+      Print("Error inconsistent colorations:\n",col1,"\n",col2,"\n\n");
+    fi;
+
+    Print("t1/t2:", TruncateFloat(t1/t2));
 end; 
