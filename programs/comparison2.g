@@ -6,7 +6,7 @@ PreOrdena:=function(G)
   V:=Vertices(G);#VertexDegees(G);
 
   SortBy(V,x-> VertexDegree(G,x));
-  Add(L,Remove(V));
+  Add(L,Remove(V,1));
 
   for i in [2..Order(G)] do 
     S:=List(V,x-> Length(Intersection(L,Adjacency(G,x))));
@@ -205,8 +205,7 @@ GG1:=function(n)
    edgs:=Union(edgs,[[1,n-1],[n-1,n]]);
    return GraphByEdges(edgs);
 end;
-
-GG2:=function(n,k) 
+Ejemplo1:=function(n,k) 
     local edgs,rest,bola;
     edgs:=Cartesian([1,n],[n-k+1..n-1]);
     rest:=Cartesian([2..n-k],Union([n-k+1..n-2],[n]));
@@ -215,28 +214,44 @@ GG2:=function(n,k)
     return GraphByEdges(edgs);
 end;
 
-GG3:=function(n,k) 
-    local edgs,rest,bola,nuevos,g;
-    edgs:=Cartesian([1,n],[n-k+1..n-1]);
-    rest:=Cartesian([2..n-k],Union([n-k+1..n-2],[n]));
-    bola:=Cartesian([n-k+1..n-1],[n-k+1..n-1]);
-    edgs:=Union(edgs,rest,bola);
-    nuevos:=[n+1..2*n];
-    edgs:=Union(edgs,Cartesian([1..n-k],nuevos));
-    return GraphByEdges(edgs);
+# GG3:=function(n,k) 
+#     local edgs,rest,bola,nuevos,g;
+#     edgs:=Cartesian([1,n],[n-k+1..n-1]);
+#     rest:=Cartesian([2..n-k],Union([n-k+1..n-2],[n]));
+#     bola:=Cartesian([n-k+1..n-1],[n-k+1..n-1]);
+#     edgs:=Union(edgs,rest,bola);
+#     nuevos:=[n+1..2*n];
+#     edgs:=Union(edgs,Cartesian([1..n-k],nuevos));
+#     return GraphByEdges(edgs);
+# end;
+
+# GG4:=function(n,k) #example to prove kcoloration2 
+#   local edgs, p1, p2, r;  
+#   k:= k+1;
+#   edgs:= PathGraph(k);
+#   p1:= Cartesian([1],[k+1..n]);
+#   r:= Cartesian([k+1..n],[2*n-k+1..(3*n-2*k-1)]);
+#   p2:= Cartesian([k],[n+1..2*n-k]);
+#   edgs:= Union(Edges(edgs),p1, p2, r);
+#   return GraphByEdges(edgs);
+# end; 
+
+#2.Ordenamiento previo
+Ejemplo2:= function(r,k)
+   local A,B,C,D,edgs;
+   A:=[1..r];
+   B:=r+[1..r+1];
+   C:=2*r+1+[1..k];
+   D:=2*r+k+1+[1..k];
+   edgs:=Cartesian(D,D);
+   edgs:=Union(edgs,Cartesian(A,B));
+   edgs:=Union(edgs,Cartesian(B,C));
+   edgs:=Union(edgs,Cartesian(A{[2..r]},D{[2..k]}));
+   edgs:=Union(edgs,Cartesian([1],D{[1..k-1]}));
+   return GraphByEdges(edgs);
 end;
 
-GG4:=function(n,k) #example to prove kcoloration2 
-  local edgs, p1, p2, r; 
-  k:= k+1;
-  edgs:= PathGraph(k);
-  p1:= Cartesian([1],[k+1..n]);
-  r:= Cartesian([k+1..n],[2*n-k+1..(3*n-2*k-1)]);
-  p2:= Cartesian([k],[n+1..2*n-k]);
-  edgs:= Union(Edges(edgs),p1, p2, r);
-  return GraphByEdges(edgs);
 
-end; 
 
 #############################
 ##############################################
