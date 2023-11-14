@@ -6,7 +6,9 @@ PreOrdena:=function(G)
   V:=Vertices(G);#VertexDegees(G);
 
   SortBy(V,x-> VertexDegree(G,x));
-  Add(L,Remove(V,1));
+  max:=VertexDegree(G,V[Length(V)]); #Obtiene el grado del vértice que está al final de la lista ordenada V. Este vértice tiene el grado máximo en el grafo.
+  pos:= PositionProperty(V, x->VertexDegree(G,x)=max); #encuentra la posición del primer vértice en la lista V que tiene el grado máximo
+  Add(L, Remove(V,pos));
 
   for i in [2..Order(G)] do 
     S:=List(V,x-> Length(Intersection(L,Adjacency(G,x))));
